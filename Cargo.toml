@@ -3,6 +3,12 @@ name = "dash"
 version = "0.1.0"
 edition = "2024"
 
+[profile.release]
+debug = false
+codegen-units = 1
+strip = true
+lto = "fat"
+
 [dependencies]
 dirs = "6.0.0"
 env_logger = "0.11.6"
@@ -10,6 +16,7 @@ eyre = "0.6.12"
 log = "0.4.25"
 rinja = "0.3.5"
 serde = { version = "1.0.218", features = ["derive"] }
+signal-hook = "0.3.17"
 thiserror = "2.0.11"
 tiny_http = "0.12.0"
 toml = "0.8.20"

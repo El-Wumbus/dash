@@ -1,14 +1,19 @@
-use log::{info, warn, error};
+use log::{error, info, warn};
 use rinja::Template as _;
 use serde::{Deserialize, Serialize};
-use std::fs::{self, File};
-use std::io::{Read, Write};
-use std::str::FromStr;
-use tiny_http::{Header, Method, Request, Response};
-use std::time::Duration;
 use signal_hook::consts::SIGHUP;
-use std::sync::{Arc, atomic::{Ordering, AtomicBool}};
-use std::path::Path;
+use std::{
+    fs::{self, File},
+    io::{Read, Write},
+    path::Path,
+    str::FromStr,
+    sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    },
+    time::Duration,
+};
+use tiny_http::{Header, Method, Request, Response};
 
 #[allow(dead_code)]
 mod uri;
@@ -39,7 +44,7 @@ impl Default for Config {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct Entry {
     name: String,
-    url: String,
+    url:  String,
     desc: Option<String>,
     icon: Option<Icon>,
 }
@@ -114,13 +119,12 @@ fn main() -> eyre::Result<()> {
                     Ok(c) => {
                         config = c;
                         info!("Reloaded config from {config_file:?}");
-                    },
+                    }
                     Err(e) => {
                         error!("Failed to reload config file {config_file:?}: {e}");
                         warn!("Using old configuration");
                     }
                 }
-                
             }
             continue;
         };
@@ -148,7 +152,10 @@ fn main() -> eyre::Result<()> {
             respond_or_log(request, Response::empty(400));
             continue;
         };
-        let path = url.path.unwrap();
+        let Some(path) = url.path else {
+            respond_or_log(request, Response::empty(400));
+            continue;
+        };
         match (path, method) {
             ("/", Method::Get) => {
                 let apps = config
